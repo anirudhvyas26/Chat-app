@@ -82,8 +82,8 @@ const Detail = () => {
           </div>
         </div>
 
-        <button>Block User</button>
       </div>
+        <button>Block User</button>
     </div>
   );
 };
