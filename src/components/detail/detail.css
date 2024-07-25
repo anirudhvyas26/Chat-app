@@ -10,23 +10,25 @@
     display: none;
   }
   .user {
-    padding: 20px 20px;
+    padding: 20px 10px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
     border-bottom: 1px solid#dddddd35;
     img {
       width: 100px;
       height: 100px;
       border-radius: 50%;
       object-fit: cover;
+      object-position: center;
+      margin-left: 100px;
     }
   }
   .info {
-    padding: 20px;
+    padding: 13px;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
 
     .option {
       .title {
@@ -90,6 +92,13 @@
     cursor: pointer;
     &:hover{
         background-color: rgb(220, 20, 60, 0.796);
+    }
+    &.logout{
+      padding: 10px;
+      background-color:#1a73e8 ;
+      &:hover{
+        background-color: #2d42e6;
+      }
     }
   }
 
