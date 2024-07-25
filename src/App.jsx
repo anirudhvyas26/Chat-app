@@ -1,7 +1,10 @@
 import Chat from "./components/chat/Chat";
+//import { ToastContainer } from "react-toastify";
+
 import  Detail from "./components/detail/Detail";
 import List from "./components/list/List";
 import Login from "./components/login/Login";
+import Notification from "./components/notification/Notification";
 const App = () => {
   const user = false;
   return (
@@ -16,7 +19,7 @@ const App = () => {
           ) : (
       <Login/>
     ) }
-     
+    <Notification/>
     </div>
   );
 };
