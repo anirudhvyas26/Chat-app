@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Chat from "./components/chat/Chat";
 //import { ToastContainer } from "react-toastify";
 
@@ -5,8 +6,19 @@ import  Detail from "./components/detail/Detail";
 import List from "./components/list/List";
 import Login from "./components/login/Login";
 import Notification from "./components/notification/Notification";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./components/lib/firebase";
 const App = () => {
   const user = false;
+
+  useEffect(()=>{
+const unsub = onAuthStateChanged(auth, (user)=>{
+console.log(user);
+  });
+  return()=>{
+    unsub();
+  };
+  },[]);
   return (
     <div className="container">
       {
