@@ -78,7 +78,7 @@ toast.success("Account created ! you can login now!!")
         <form onSubmit={handleLogin}>
           <input type="text" placeholder="Email" name="email" />
           <input type="password" placeholder="password" name="password" />
-          <button disabled={loading}>{loading ?"Loading":"Sign Up"}</button>
+          <button disabled={loading}>{loading ?"Loading":"Sign In"}</button>
         </form>
       </div>
       <div className="separator"></div>
