@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import "./chat.css";
 import EmojiPicker from "emoji-picker-react";
-import { onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
 const Chat = () => {
+  const [chat, setChat] = useState();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const endRef =useRef(null)
@@ -13,11 +15,15 @@ const Chat = () => {
 
 useEffect(()=>{
   const unSub = onSnapshot(doc(db,"chats", "E5PphRCwQRRyZGKFQbY8"), (res)=>{
-    
+setChat(res.data());
   }
-  )
-})
+  );
 
+  return()=>{
+    unSub();
+  }
+},[]);
+console.log(chat)
   const handleEmoji = e =>{
     setText((prev) => prev+e.emoji);
     setOpen(false);
