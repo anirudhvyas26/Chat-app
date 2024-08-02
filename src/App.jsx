@@ -9,9 +9,11 @@ import Notification from "./components/notification/Notification";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./components/lib/firebase";
 import { useUserStore } from "./components/lib/userStore";
+import { useChatStore } from "./components/lib/chatStore.js";
 const App = () => {
   // const user = true;
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
+  const { chatId } = useChatStore();
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -29,8 +31,8 @@ const App = () => {
       {currentUser ? (
         <>
           <List />
-          <Chat />
-          <Detail />
+          {chatId &&<Chat />}
+          {chatId &&<Detail />}
         </>
       ) : (
         <Login />
