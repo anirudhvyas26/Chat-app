@@ -1,34 +1,70 @@
 import { useEffect, useRef, useState } from "react";
 import "./chat.css";
 import EmojiPicker from "emoji-picker-react";
-import { doc, onSnapshot } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import {  useChatStore } from "../lib/chatStore.js";
+import { useChatStore } from "../lib/chatStore.js";
+import { useUserStore } from "../lib/userStore.js";
 const Chat = () => {
   const [chat, setChat] = useState();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
-  const endRef =useRef(null)
-const {chatId} = useChatStore();
-  useEffect(()=>{
-    endRef.current?.scrollIntoView({behavior: "smooth"});}, []);
+  const endRef = useRef(null);
+  const { chatId, user } = useChatStore();
+  const { currentUser } = useUserStore();
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
-useEffect(()=>{
-  const unSub = onSnapshot(doc(db,"chats", chatId), (res)=>{
-setChat(res.data());
-  }
-  );
+  useEffect(() => {
+    const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
+      setChat(res.data());
+    });
 
-  return()=>{
-    unSub();
-  }
-},[chatId]);
-console.log(chat)
-  const handleEmoji = e =>{
-    setText((prev) => prev+e.emoji);
+    return () => {
+      unSub();
+    };
+  }, [chatId]);
+  console.log(chat);
+  const handleEmoji = (e) => {
+    setText((prev) => prev + e.emoji);
     setOpen(false);
   };
-  console.log(text);
+  const handleSend = async () => {
+    if (!text === "") return;
+
+    try {
+      await updateDoc(doc(db, "chats", chatId), {
+        messages: arrayUnion({
+          senderId: currentUser.id,
+          text,
+          createdAt: new Date(),
+        }),
+      });
+const userIDs = [currentUser.id, user.id];
+userIDs.forEach(async (id)=> {
+
+  const userChatsRef = doc(db, "userchats", id);
+  const userChatSnapshot = await getDoc(userChatsRef);
+  
+  if(userChatSnapshot.exists()){
+    const userChatsData = userChatSnapshot.data()
+    
+    const chatIndex = userChatsData.chats.findIndex(c=> c.chatId === chatId)
+    
+    userChatsData.chats[chatIndex].lastMessage =text;
+    userChatsData.chats[chatIndex].isSeen =id === currentUser.id ? true: false;
+    userChatsData.chats[chatIndex].updatedAt =Date.now();
+    
+    await updateDoc(userChatsRef,{
+      chats: userChatsData.chats,
+    });
+  }
+});
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
     <div className="chat">
       <div className="top">
@@ -38,7 +74,7 @@ console.log(chat)
             <span>Anirudh </span>
             <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</p>
           </div>
-        </div> 
+        </div>
 
         <div className="icons">
           <img src="./phone.png" alt="" />
@@ -47,41 +83,16 @@ console.log(chat)
         </div>
       </div>
       <div className="center">
-        <div className="message">
-          <img src="./avatar.png" alt="" />
-          <div className="text">
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magnam accusantium eveniet ea reprehenderit repudiandae veritatis, harum, rerum totam explicabo vitae voluptas, quidem atque officia neque culpa corporis corrupti consectetur voluptate.</p>
-            <span>1 min ago</span>
+        {chat?.messages?.map((message) => (
+          <div className="message own" key={message?.createdAt}>
+            <div className="text">
+              {message.img && <img src={message.img} alt="" />}
+              <p>{message.text}</p>
+              <span>1 min ago</span>
+            </div>
           </div>
-        </div>
-        <div className="message own">
-          <div className="text">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV4BxtcDUblZ6_yWsCUOg7_jflIL6mo7Uqn-IKQgC8poObFKkU" alt="" />
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magnam accusantium eveniet ea reprehenderit repudiandae veritatis, harum, rerum totam explicabo vitae voluptas, quidem atque officia neque culpa corporis corrupti consectetur voluptate.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message">
-          <img src="./avatar.png" alt="" />
-          <div className="text">
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magnam accusantium eveniet ea reprehenderit repudiandae veritatis, harum, rerum totam explicabo vitae voluptas, quidem atque officia neque culpa corporis corrupti consectetur voluptate.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message own">
-          <div className="text">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV4BxtcDUblZ6_yWsCUOg7_jflIL6mo7Uqn-IKQgC8poObFKkU" alt="" />
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magnam accusantium eveniet ea reprehenderit repudiandae veritatis, harum, rerum totam explicabo vitae voluptas, quidem atque officia neque culpa corporis corrupti consectetur voluptate.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message">
-          <img src="./avatar.png" alt="" />
-          <div className="text">
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magnam accusantium eveniet ea reprehenderit repudiandae veritatis, harum, rerum totam explicabo vitae voluptas, quidem atque officia neque culpa corporis corrupti consectetur voluptate.</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
+        ))}
+
         <div ref={endRef}></div>
       </div>
       <div className="bottom">
@@ -90,16 +101,25 @@ console.log(chat)
           <img src="./camera.png" alt="" />
           <img src="./mic.png" alt="" />
         </div>
-        <input type="text" placeholder="Type a message..." value={text} onChange={e=>setText(e.target.value)} />
+        <input
+          type="text"
+          placeholder="Type a message..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
         <div className="emoji">
-          <img src="./emoji.png" alt=""
-          onClick={()=> setOpen((prev)=> !prev)}/>
+          <img
+            src="./emoji.png"
+            alt=""
+            onClick={() => setOpen((prev) => !prev)}
+          />
           <div className="picker">
-
-          <EmojiPicker open={open} onEmojiClick={handleEmoji}/>
+            <EmojiPicker open={open} onEmojiClick={handleEmoji} />
           </div>
         </div>
-        <button className="sendButton">send</button>
+        <button className="sendButton" onClick={handleSend}>
+          send
+        </button>
       </div>
     </div>
   );
