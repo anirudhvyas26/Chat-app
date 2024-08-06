@@ -4,7 +4,8 @@ import AddUser from "./addUser/AddUser";
 import { useUserStore } from "../../lib/userStore";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
-import { useChatStore } from "../../lib/chatStore.js";
+import { useChatStore } from "../../lib/chatStore";
+
 
 const ChatList = () => {
   const [addMode, setAddMode] = useState(false);

@@ -9,7 +9,8 @@ import Notification from "./components/notification/Notification";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./components/lib/firebase";
 import { useUserStore } from "./components/lib/userStore";
-import { useChatStore } from "./components/lib/chatStore.js";
+import { useChatStore } from "./components/lib/chatStore";
+
 const App = () => {
   // const user = true;
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();

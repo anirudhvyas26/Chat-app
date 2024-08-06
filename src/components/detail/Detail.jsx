@@ -2,7 +2,8 @@ import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 import "./detail.css";
 import { useUserStore } from "../lib/userStore";
-import { useChatStore } from "../lib/chatStore.js";
+import { useChatStore } from "../lib/chatStore";
+
 
 const Detail = () => {
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock, resetChat } =

@@ -3,9 +3,11 @@ import "./chat.css";
 import EmojiPicker from "emoji-picker-react";
 import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import { useChatStore } from "../lib/chatStore.js";
+
 import { useUserStore } from "../lib/userStore.js";
 import upload from "../lib/upload.js";
+import { useChatStore } from "../lib/chatStore.js";
+
 
 const Chat = () => {
   const [chat, setChat] = useState();
